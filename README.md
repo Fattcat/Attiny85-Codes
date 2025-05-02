@@ -2,3 +2,4 @@
 
 - [x] Distance measuring in meters and centimeters using Oled display
 - [x] Temperature and humudity (DHT11) with using Oled display
+- Look at the photo of Attiny85 pins in this reposistory !
