@@ -1,51 +1,46 @@
 #include <TinyWireM.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include <Tiny4kOLED.h>
 
-#define OLED_RESET  4
-Adafruit_SSD1306 display(128, 64, &TinyWireM, OLED_RESET);
-
-#define TRIG_PIN    3 // PB3 - pin 2 na čipe
-#define ECHO_PIN    4 // PB4 - pin 3 na čipe
+const int trigPin = 3; // PB3 = pin 2 fyzicky
+const int echoPin = 4; // PB4 = pin 3 fyzicky
 
 void setup() {
+  // Inicializácia OLED
   TinyWireM.begin();
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Adresa I2C OLED displeja (zvyčajne 0x3C)
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  oled.begin();
+  oled.clear();
+  oled.on();
+  oled.setFont(FONT6X8);
 
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  // Nastavenie pinov
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 void loop() {
-  // Spusti trig impulz
-  digitalWrite(TRIG_PIN, LOW);
+  long duration;
+  float distance_cm;
+
+  // Vyslanie pulzu
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
+  digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(trigPin, LOW);
 
-  // Meraj čas návratu
-  long duration = pulseIn(ECHO_PIN, HIGH);
+  // Meranie času echa
+  duration = pulseIn(echoPin, HIGH);
 
-  // Výpočet vzdialenosti
-  float distance_cm = duration * 0.0343 / 2;
-  float distance_m = distance_cm / 100.0;
+  // Výpočet vzdialenosti (v cm)
+  distance_cm = duration * 0.034 / 2.0;
 
-  // Zobrazenie na OLED
-  display.clearDisplay();
-  display.setCursor(0, 0);
-  display.print("Vzdialenost:");
-  display.setCursor(0, 20);
-  display.print(distance_cm, 1);
-  display.print(" cm");
+  // Výpis na OLED
+  oled.clear();
+  oled.setCursor(0, 0);
+  oled.print(F("Vzdialenost:"));
+  oled.setCursor(0, 2);
+  oled.print(distance_cm, 1);
+  oled.print(F(" cm"));
 
-  display.setCursor(0, 40);
-  display.print(distance_m, 2);
-  display.print(" m");
-
-  display.display();
-  delay(500); // Obnova každých 500 ms
+  delay(500);
 }
