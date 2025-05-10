@@ -49,3 +49,55 @@ void loop() {
     float promile = map(val, 0, 1023, 0, 20) / 10.0;
     String stavText = getAlcoholLevel(val);
 
+// 1. RAW - v strede hornej časti
+    if (val != lastRawValue) {
+      String rawText = "RAW: " + String(val);
+      int rawLength = rawText.length() * 6;  // 6 px per character for FONT6X8
+      oled.setCursor((128 - rawLength) / 2, 0);  // Center horizontally
+      oled.print(rawText);
+      lastRawValue = val;
+    }
+
+    // 2. Promile - v strede pod RAW
+    if (promile != lastPromile) {
+      String promileText = "Promile: " + String(promile, 1);
+      int promileLength = promileText.length() * 6;  // 6 px per character for FONT6X8
+      oled.setCursor((128 - promileLength) / 2, 2);  // Center horizontally
+      oled.print(promileText);
+      lastPromile = promile;
+    }
+
+    // 3. Stav - v spodnej časti displeja
+    if (stavText != lastStav) {
+      int stavLength = stavText.length() * 6;  // 6 px per character for FONT6X8
+      oled.setCursor((128 - stavLength) / 2, 5);  // Center horizontally
+      oled.print(stavText);
+      lastStav = stavText;
+    }
+  }
+
+  delay(1000);
+}
+
+int readAlcohol() {
+  long sum = 0;
+  for (int i = 0; i < 10; i++) {
+    sum += analogRead(ANALOG_PIN);
+    delay(10);
+  }
+  return sum / 10;
+}
+
+String getAlcoholLevel(int value) {
+  if (value < 241) {
+    return "Triezvy";
+  } else if (value < 280) {
+    return "1 pivo";
+  } else if (value < 350) {
+    return "2+ piv";
+  } else if (value < 450) {
+    return "3+ piv";
+  } else {
+    return "Opity!";
+  }
+}
