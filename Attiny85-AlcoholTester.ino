@@ -4,6 +4,9 @@
 #define ANALOG_PIN A3
 #define WARMUP_TIME 22
 
+// Globálny OLED objekt
+//Tiny4kOLED oled;
+
 unsigned long startTime;
 bool displayCleared = false;
 
@@ -44,12 +47,12 @@ void loop() {
     }
 
     int val = readAlcohol();
-    float promile = map(val, 0, 1023, 0, 20) / 10.0;  // 0.0 až 2.0 ‰
-    String stavText = (promile >= 0.2) ? getAlcoholLevel(promile) : "";
+    float promile = map(val, 0, 1023, 0, 40) / 10.0;  // rozsah 0.0–4.0‰
+    String stavText = (promile >= 0.2) ? getAlcoholLevel(promile) : "Triezvy";
 
     oled.setFont(FONT6X8);
 
-    // 1. RAW
+    // 1. RAW hodnota
     if (val != lastRawValue) {
       clearLine(0);
       String rawLine = "RAW: " + String(val);
@@ -61,7 +64,7 @@ void loop() {
     // 2. Promile
     if (promile != lastPromile) {
       clearLine(2);
-      String proLine = "Promile: " + String(promile, 1);
+      String proLine = "Promile: " + String(promile, 1) + "‰";
       oled.setCursor(centerText(proLine), 2);
       oled.print(proLine);
       lastPromile = promile;
@@ -70,11 +73,9 @@ void loop() {
     // 3. Stav
     if (stavText != lastStav) {
       clearLine(5);
-      if (stavText.length() > 0) {
-        String stavLine = "Stav: " + stavText;
-        oled.setCursor(centerText(stavLine), 5);
-        oled.print(stavLine);
-      }
+      String stavLine = "Stav: " + stavText;
+      oled.setCursor(centerText(stavLine), 5);
+      oled.print(stavLine);
       lastStav = stavText;
     }
   }
@@ -91,22 +92,24 @@ int readAlcohol() {
   return sum / 10;
 }
 
-// Určuje "stav" podľa vypočítaného promile
+// Určenie úrovne alkoholu podľa promile
 String getAlcoholLevel(float promile) {
   if (promile < 0.2) return "Triezvy";
   else if (promile < 0.5) return "1 pivo";
   else if (promile < 0.8) return "2+ piv";
   else if (promile < 1.2) return "3+ piv";
-  else return "Opity!";
+  else if (promile < 2.0) return "Opity!";
+  else if (promile < 3.0) return "Tazko opity!";
+  else return "NEBEZPECNY STAV!";
 }
 
-// Vypočíta X pozíciu pre stredné zarovnanie textu
+// Centrálne zarovnanie textu na OLED displeji
 int centerText(String text) {
-  int textWidth = text.length() * 6;
+  int textWidth = text.length() * 6; // FONT6X8 = 6 px šírka znaku
   return max((128 - textWidth) / 2, 0);
 }
 
-// Vymaže daný riadok prepísaním medzerami
+// Vymazanie riadku
 void clearLine(uint8_t line) {
   oled.setCursor(0, line);
   for (int i = 0; i < 21; i++) {
