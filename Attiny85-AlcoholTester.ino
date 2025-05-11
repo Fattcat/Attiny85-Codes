@@ -2,7 +2,7 @@
 #include <Tiny4kOLED.h>
 
 #define ANALOG_PIN A3
-#define WARMUP_TIME 10
+#define WARMUP_TIME 22
 
 unsigned long startTime;
 bool displayCleared = false;
@@ -44,38 +44,36 @@ void loop() {
     }
 
     int val = readAlcohol();
-    float promile = map(val, 0, 1023, 0, 20) / 10.0;
-    String stavText = (promile >= 0.3) ? getAlcoholLevel(val) : "";
+    float promile = map(val, 0, 1023, 0, 20) / 10.0;  // 0.0 až 2.0 ‰
+    String stavText = (promile >= 0.2) ? getAlcoholLevel(promile) : "";
 
     oled.setFont(FONT6X8);
 
     // 1. RAW
     if (val != lastRawValue) {
-      oled.setCursor(0, 0);
-      oled.clearLine(0);
-      oled.setCursor(0, 0);
-      oled.print("RAW: ");
-      oled.print(val);
+      clearLine(0);
+      String rawLine = "RAW: " + String(val);
+      oled.setCursor(centerText(rawLine), 0);
+      oled.print(rawLine);
       lastRawValue = val;
     }
 
     // 2. Promile
     if (promile != lastPromile) {
-      oled.setCursor(0, 2);
-      oled.clearLine(2);
-      oled.setCursor(0, 2);
-      oled.print("Promile: ");
-      oled.print(promile, 1);
+      clearLine(2);
+      String proLine = "Promile: " + String(promile, 1);
+      oled.setCursor(centerText(proLine), 2);
+      oled.print(proLine);
       lastPromile = promile;
     }
 
     // 3. Stav
     if (stavText != lastStav) {
-      oled.setCursor(0, 5);
-      oled.clearLine(5);
+      clearLine(5);
       if (stavText.length() > 0) {
-        oled.setCursor((128 - stavText.length() * 6) / 2, 5);
-        oled.print(stavText);
+        String stavLine = "Stav: " + stavText;
+        oled.setCursor(centerText(stavLine), 5);
+        oled.print(stavLine);
       }
       lastStav = stavText;
     }
@@ -93,10 +91,25 @@ int readAlcohol() {
   return sum / 10;
 }
 
-String getAlcoholLevel(int value) {
-  if (value < 241) return "Triezvy";
-  else if (value < 280) return "1 pivo";
-  else if (value < 350) return "2+ piv";
-  else if (value < 450) return "3+ piv";
+// Určuje "stav" podľa vypočítaného promile
+String getAlcoholLevel(float promile) {
+  if (promile < 0.2) return "Triezvy";
+  else if (promile < 0.5) return "1 pivo";
+  else if (promile < 0.8) return "2+ piv";
+  else if (promile < 1.2) return "3+ piv";
   else return "Opity!";
+}
+
+// Vypočíta X pozíciu pre stredné zarovnanie textu
+int centerText(String text) {
+  int textWidth = text.length() * 6;
+  return max((128 - textWidth) / 2, 0);
+}
+
+// Vymaže daný riadok prepísaním medzerami
+void clearLine(uint8_t line) {
+  oled.setCursor(0, line);
+  for (int i = 0; i < 21; i++) {
+    oled.print(" ");
+  }
 }
