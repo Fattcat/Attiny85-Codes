@@ -14,10 +14,10 @@ void setup() {
   oled.setFont(FONT8X16);
 
   // Vykresli len statické texty raz
-  oled.setCursor(0, 0);
+  oled.setCursor(10, 0);
   oled.print("Teplota:"); // Riadok 0
 
-  oled.setCursor(0, 2);
+  oled.setCursor(10, 2);
   oled.print("Vlhkost:"); // Riadok 2
 }
 
@@ -29,16 +29,16 @@ void loop() {
   char buffer[6];
 
   // Zmaž staré čísla teploty
-  oled.setCursor(8 * 9, 0);  // pozícia za "Teplota:"
+  oled.setCursor(9 * 9, 0);  // pozícia za "Teplota:"
   oled.print("     ");       // vymazanie
 
   // Zapíš novú teplotu
   sprintf(buffer, "%d C", temp);
-  oled.setCursor(8 * 9, 0);
+  oled.setCursor(9 * 9, 0);
   oled.print(buffer);
 
   // Zmaž starú vlhkosť
-  oled.setCursor(8 * 9, 2);  // pozícia za "Vlhkost:"
+  oled.setCursor(9 * 9, 2);  // pozícia za "Vlhkost:"
   oled.print("     ");
 
   // Zapíš novú vlhkosť
