@@ -15,10 +15,10 @@ void setup() {
 
   // Vykresli len statické texty raz
   oled.setCursor(10, 10);
-  oled.print("Teplota:"); // Riadok 0
+  oled.print("Teplota"); // Riadok 0
 
   oled.setCursor(10, 12);
-  oled.print("Vlhkost:"); // Riadok 2
+  oled.print("Vlhkost"); // Riadok 2
 }
 
 void loop() {
@@ -29,21 +29,21 @@ void loop() {
   char buffer[6];
 
   // Zmaž staré čísla teploty
-  oled.setCursor(9 * 9, 10);  // pozícia za "Teplota:"
+  oled.setCursor(81, 10);  // pozícia za "Teplota:"
   oled.print("     ");       // vymazanie
 
   // Zapíš novú teplotu
-  sprintf(buffer, "%d C", temp);
-  oled.setCursor(9 * 9, 10);
+  sprintf(buffer, "%d ", temp); // toto robilo problem ked tam bolo "C"
+  oled.setCursor(81, 10);
   oled.print(buffer);
 
   // Zmaž starú vlhkosť
-  oled.setCursor(9 * 9, 12);  // pozícia za "Vlhkost:"
+  oled.setCursor(81, 12);  // pozícia za "Vlhkost:"
   oled.print("     ");
 
   // Zapíš novú vlhkosť
-  sprintf(buffer, "%d %%", hum);
-  oled.setCursor(9 * 9, 12);
+  sprintf(buffer, "%d ", hum); // toto robilo problem ked tam bolo "%"
+  oled.setCursor(81, 12);
   oled.print(buffer);
 
   delay(2000);
